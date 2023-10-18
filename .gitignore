@@ -1,0 +1,8 @@
+*.code-workspace
+.env
+redis/data/
+queue
+*.bak
+.DS_Store
+microservices/tmp
+microservices/.env

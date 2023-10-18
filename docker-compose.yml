@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - './queue/data:/var/lib/rabbitmq'
+      - './queue/log:/var/log/rabbitmq'
+  api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile/go-dev.Dockerfile
+    container_name: microservices
+    volumes:
+      - './microservices:/app'
+    working_dir: /app
+    ports:
+      - 3001:3001
+    command: air
+    links:
+      - rabbitmq
+    depends_on:
+      - database
+  database:
+    container_name: database
+    image: postgres:14.8-alpine
+    env_file:
+      - ./microservices/.env
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata: {}
